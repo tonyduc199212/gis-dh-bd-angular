@@ -1,0 +1,11 @@
+<!-- <page-header [hidden]="true"></page-header> -->
+<div class="map" id="map">
+    <map-layerlist        [hidden]="!_isShowLayerlist" [map]="_map" (onClose)="onCloseLayerlist()" (onChecked)="onCheckLayerlist($event)"></map-layerlist>
+    <!-- <map-search-widget [hidden]="!_isShowSearchWidget" (onClose)="onCloseSearchWidget()" (onClickSearchRow)="zoomAndShowPopup($event)"></map-search-widget> -->
+</div>
+<!-- <map-controls></map-controls> -->
+<map-button-group (onAction)="takeActionFromButtonGroup($event)"></map-button-group>
+<map-popup-data [position]="'top-right'" (onClose)="onClosePopupInfor()"></map-popup-data>
+<!-- <map-popup-editor [position]="'top-right'" (onSubmit)="onSubmitPopupCreate($event)" (onSave)="onSavePopupUpdate($event)" (onClose)="onClosePopupUpdate()"></map-popup-editor> -->
+<map-geocoding></map-geocoding>
+<!-- <iframe-modal [title]="'stream-report-title'"></iframe-modal> -->

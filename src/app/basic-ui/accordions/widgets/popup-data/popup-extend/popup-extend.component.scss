@@ -1,0 +1,62 @@
+
+
+.card.popup-extend {
+    position: absolute;
+    z-index: 900;
+    box-shadow: 5px 0 5px -2px rgba(0,0,0,0.1) !important;
+    background-color: white; 
+    width: 20rem!important;
+    background-color: white; 
+    &.top-left {
+        left: 20rem;
+        height: 30rem;
+        max-height: 30rem;
+    }
+
+    &.top-right{
+        right: 24rem;
+        top: 70px;
+        height: 30rem;
+        max-height: 30rem;
+    }
+
+    &.lg-position{
+        right: 44rem!important;
+    }
+
+    .card-footer {
+        height: 70px!important;
+        padding-left: 1rem;
+        padding-right: .5rem;
+    } 
+    .card-header {
+        height: 50px!important;
+        padding-left: 1rem;
+        padding-right: .5rem;
+        .popup-subtitle {
+            font-size: .7rem;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: .5rem;
+        }
+    }
+    .card-body {
+        padding: 0 .5rem 0 1rem!important;
+        height: calc(100% - 100px);
+        max-height: calc(100% - 100px);
+        overflow: auto;
+        .popup-content{
+            font-size: .8rem;
+        }
+        .popup-row {
+            margin-bottom: .5rem;
+            min-height: 30px;
+        }
+        .popup-row:hover{
+            background-color: azure;
+        }
+    }
+}
+.text-overflow{
+    width: 280px!important;
+  }

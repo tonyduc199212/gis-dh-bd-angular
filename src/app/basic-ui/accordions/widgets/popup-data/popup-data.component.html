@@ -1,0 +1,168 @@
+<div class="card stretch-card popup-data" [@slideDown]="isHiddenPopup ? 'close' : 'open'"
+    [ngClass]="{'minimize': _isMinimizePopup, 'maximize': !_isMinimizePopup, 
+    'expand': _popupSize == 'lg' && !_isMinimizePopup,
+    'top-right': position === 'top-right', 'top-left': position === 'top-left'}" 
+    *ngIf="!isHiddenPopup"
+>
+    <div class="card-header">
+        <div class="row p-0 pl-3">
+            <div class="col-11 pt-1 text-center" (click)="headerClick()">
+                <p class="mb-0 pb-0 text-primary"><b>{{'Thông tin dữ liệu'}}</b></p> 
+                <span [tooltip]="_title" class="popup-subtitle text-overflow">{{_title}}</span>
+            </div>
+            <div class="col-1">
+                <button *ngIf="!_isMinimizePopup" class="btn-minimize" [tooltip]="'global_minimize'" (click)="togglePopupMinimize()"><i class="mdi mdi-window-minimize mdi-18px"></i></button>
+                <button *ngIf="_isMinimizePopup" class="btn-minimize" [tooltip]="'global_maximize'" (click)="togglePopupMinimize()"><i class="mdi mdi-window-maximize mdi-18px"></i></button>
+                <button *ngIf="_popupSize == 'md'" class="btn-toggle-size" [tooltip]="'global_maximize'" (click)="togglePopupSize('lg')"><i class="mdi mdi-arrow-expand mdi-18px"></i></button>
+                <button *ngIf="_popupSize == 'lg'" class="btn-toggle-size" [tooltip]="'global_maximize'" (click)="togglePopupSize('md')"><i class="mdi mdi-arrow-collapse mdi-18px"></i></button>
+                <button class="btn-close" [tooltip]="'global_close'" (click)="close()"><i class="mdi mdi-window-close mdi-18px"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body pr-0" [hidden]="_isMinimizePopup">
+        <perfect-scrollbar class="scrollView" [config]="scrollbarConfig">
+            <div class="text-center" *ngIf="_isPermPage">
+                <ng-container *ngFor="let child of linkTable" >
+                    <button *ngIf="child.permissionObjClass && checkPermission(child.permissionObjClass, _permissionViewType)" class="btn btn-{{child.btnColor}} p-1" [tooltip]="renderTooltipForChildLink(child.name)" (click)="openLinkTableModal(child)"><span class="{{child.iconCode}}"></span></button>
+                </ng-container>
+            </div>
+            <div *ngIf="_data" class="popup-content">
+                <div>
+                    <p class="title-group-data bg-title-basic p-2"> {{'Thông tin Cơ bản'}} 
+                        <button class="btn btn-action" (click)="toggleBasicInfor()">
+                            <i *ngIf="_isShowBasicInfor" class="mdi mdi-chevron-down"></i>
+                            <i *ngIf="!_isShowBasicInfor" class="mdi mdi-chevron-left"></i>
+                        </button>
+                    </p>
+                    <div *ngFor="let item of _basicInforData | keyvalue: orderBySeqNumber" [hidden]="!_isShowBasicInfor">
+                        <div class="row popup-row align-items-center" *ngIf="checkConstraintFieldByAnother(item.value.parentCode, item.value.parentCondition)">
+                            <div class="col-5 p-1">
+                                <span class="popup-content-title">{{item.value.name}}</span>:
+                            </div>
+                            <div class="col-7 p-1">
+                                <span *ngIf="!item.value.value || item.value.value.length === 0; else valueNotNull" class="popup-content-value"><i>{{'Không có thông tin'}}</i></span>
+                                <ng-template #valueNotNull>
+                                    <span *ngIf="checkType(item.value.value) == 'object' && item.value.value.name; else checkShowTime" class="popup-content-value">{{item.value.value.name}}</span>
+                                    <ng-template #checkShowTime>
+                                        <span *ngIf="checkType(item.value.value) == 'object' && item.value.value.time; else checkShowIncident" class="popup-content-value">{{checkAndFormatValue(item.value, item.value.value.time)}}</span>
+                                    </ng-template>
+                                    <ng-template #checkShowIncident>
+                                        <span *ngIf="checkType(item.value.value) == 'object' && item.value.value.incidentType && item.value.value.incidentDate; else showArray" class="popup-content-value">
+                                            {{'global-time'}}: {{checkAndFormatValue(item.value, item.value.value.incidentDate)}}<br>
+                                            {{'global-incident'}}: {{item.value.value.incidentType.name}}
+                                        </span>
+                                    </ng-template>
+                                    <ng-template #showArray>
+                                        <div *ngIf="checkType(item.value.value) == 'object' && item.value.value.length > 0; else showValueOnly" class="popup-content-value">
+                                            <div *ngIf="item.value.value[0]" class="row w-100">
+                                                <div class="col-10">
+                                                    <span>{{'global_true'}}</span>
+                                                </div>
+                                                <div class="col-2 pr-3 text-right">
+                                                    <button class="btn btn-success p-1" [tooltip]="'global_view-detail'" (click)="openInfoModal(item.key, item.value.name, item.value.value)"><i class="mdi mdi-dots-vertical"></i></button>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="!item.value.value[0]" class="row w-100">
+                                                <div class="col-10">
+                                                    <span>{{'global_false'}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ng-template #showValueOnly>
+                                            <span *ngIf="item.value.componentUi != 'TextArea'" class="popup-content-value">{{checkAndFormatValue(item.value, item.value.value)}}</span>
+                                            <div *ngIf="item.value.componentUi == 'TextArea'" class="popup-content-value" [innerHTML]="formatTextArea(item.value.value)"></div>
+                                        </ng-template>
+                                    </ng-template>
+                                </ng-template>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+                <div>
+                    <p class="title-group-data bg-title-detail p-2">{{'Thông tin Chi tiết'}} 
+                        <button class="btn btn-action" (click)="toggleDetailInfor()">
+                            <i *ngIf="_isShowDetailInfor" class="mdi mdi-chevron-down"></i>
+                            <i *ngIf="!_isShowDetailInfor" class="mdi mdi-chevron-left"></i>
+                        </button>
+                    </p>
+                    <div *ngFor="let item of _detailInforData | keyvalue: orderBySeqNumber" [hidden]="!_isShowDetailInfor">
+                        <div *ngIf="checkConstraintFieldByAnother(item.value.parentCode, item.value.parentCondition)">
+                            <div *ngIf="checkNotShowingField(item.key) && item.value.componentUi" class="row popup-row align-items-center">
+                                <div class="col-5 p-1">
+                                    <span class="popup-content-title">{{item.value.name}}</span>:
+                                </div>
+                                <div class="col-7 p-1">
+                                    <span *ngIf="!item.value.value || item.value.value.length === 0; else valueNotNull" class="popup-content-value"><i>{{'Không có thông tin'}}</i></span>
+                                    <ng-template #valueNotNull>
+                                        <span *ngIf="checkType(item.value.value) == 'object' && item.value.value.name; else checkShowTime" class="popup-content-value">{{item.value.value.name}}</span>
+                                        <ng-template #checkShowTime>
+                                            <span *ngIf="checkType(item.value.value) == 'object' && item.value.value.time; else checkShowIncident" class="popup-content-value">{{checkAndFormatValue(item.value, item.value.value.time)}}</span>
+                                        </ng-template>
+                                        <ng-template #checkShowIncident>
+                                            <div *ngIf="checkType(item.value.value) == 'object' && item.value.value.incidentType && item.value.value.incidentDate; else showArray" class="popup-content-value">
+                                                <div class="row">
+                                                    <div class="col-10">
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                {{'global-incident'}}:
+                                                            </div>
+                                                            <div class="col-6">
+                                                                {{item.value.value.incidentType.name}}
+                                                            </div>
+                                                            <div class="col-6">
+                                                                {{'global-time'}}:
+                                                            </div>
+                                                            <div class="col-6">
+                                                                {{formatDate(item.value.value.incidentDate)}}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-2 pr-3 text-right my-auto">
+                                                        <button class="btn btn-success p-1" [tooltip]="'global_view-list'" (click)="openLinkTable('global-incident', item.value.dataType, _data.code)"><i class="mdi mdi-format-list-bulleted"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #showArray>
+                                            <div *ngIf="checkType(item.value.value) == 'object' && item.value.value.length > 0; else showValueOnly" class="popup-content-value">
+                                                <div *ngIf="item.value.value[0]" class="row w-100">
+                                                    <div class="col-10">
+                                                        <span>{{'global_true'}}</span>
+                                                    </div>
+                                                    <div class="col-2 pr-3 text-right">
+                                                        <button class="btn btn-success p-1" [tooltip]="'global_view-detail'" (click)="openInfoModal(item.key, item.value.name, item.value.value)"><i class="mdi mdi-dots-vertical"></i></button>
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="!item.value.value[0]" class="row w-100">
+                                                    <div class="col-10">
+                                                        <span>{{'global_false'}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <ng-template #showValueOnly>
+                                                <span *ngIf="item.value.componentUi != 'TextArea'" class="popup-content-value">{{checkAndFormatValue(item.value, item.value.value)}}</span>
+                                                <div *ngIf="item.value.componentUi == 'TextArea'" class="popup-content-value" [innerHTML]="formatTextArea(item.value.value)"></div>
+                                            </ng-template>
+                                        </ng-template>
+                                    </ng-template>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </perfect-scrollbar>
+    </div>
+    <div class="card-footer text-right" [hidden]="_isMinimizePopup">
+        <div class="btn-action-group" *ngIf="currentLayer">
+            <!-- <button class="btn-action-popup text-warning" (click)="redirectToAttachFile()" [tooltip]="'global_view_attach_file'"><i class="mdi mdi-attachment"></i></button> -->
+            <!-- <button class="btn-action-popup text-success" (click)="downloadExcel()" [tooltip]="'global_download'"><i class="mdi mdi-download"></i></button> -->
+            <!-- <button class="btn-action-popup text-primary" *ngIf="checkPermission(currentLayer, _permissionUpdateType) && _isPermPage" (click)="updateFeature()" [tooltip]="'global_update'"><i class="mdi mdi-pencil"></i></button>
+            <button class="btn-action-popup text-danger" *ngIf="checkPermission(currentLayer, _permissionDeleteType) && _isPermPage" (click)="openDeleteModal()" [tooltip]="'global_delete'"><i class="mdi mdi-delete"></i></button> -->
+            <button  class="btn-action-popup text-dark" (click)="close()" [tooltip]="'global_close'"><i class="mdi mdi-cancel"></i></button>
+        </div>
+    </div>
+</div>
+<map-popup-extend [position]="position"></map-popup-extend>
+<!-- <confirm-modal (onClick)="deleteFeature($event)" [title]="title" [content]="subTitle" [type]="modalType"></confirm-modal> -->
+<!-- <map-subtable (onSubtableAction)="onSubtableAction()"></map-subtable> -->

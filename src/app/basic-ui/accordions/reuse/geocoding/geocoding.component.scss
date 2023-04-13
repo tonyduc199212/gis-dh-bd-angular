@@ -1,0 +1,31 @@
+.address-window {
+    position: absolute; 
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    z-index: 1000;
+    background-color: white; 
+    padding: .35rem .5rem; 
+    border-radius: 5px; 
+    max-width: 25rem;
+    overflow: auto;
+    box-shadow: 0 1px 7px rgba(0,0,0,0.4);
+    bottom: 0rem;
+    button {
+        position: absolute;
+        font-size: .7rem;
+        padding: 0;
+        right: .1rem;
+        top: .1rem;
+        color: #ccc;
+        &:hover {
+            color: #aaa;
+        }
+    }
+    p.address {
+        font-size: 0.7rem;
+    }
+    p.coordinate {
+        font-size: 0.7rem;
+        color: rgb(163, 162, 162);
+    }
+}

@@ -1,0 +1,62 @@
+.card.layer-list {
+    position: absolute;
+    left: 0;
+    z-index: 900;
+    width: 20rem!important;
+    background-color: white; 
+    height: 100%;
+    max-height: 100%;
+    box-shadow: 5px 0 5px -2px rgba(0,0,0,0.1) !important;
+    &.expand {
+        width: 30rem!important;
+    }
+    .card-footer {
+        height: 50px!important;
+        padding-left: 1rem;
+        padding-right: .5rem;
+        box-shadow: 0px 0px 5px -2px rgba(0, 0, 0, 0.1) !important;
+    } 
+    .card-header {
+        height: 50px!important;
+        padding-left: 1rem;
+        padding-right: .5rem;
+        box-shadow: 0px 1px 5px -2px rgba(0, 0, 0, 0.1) !important;
+    }
+    .card-body {
+        margin: .5rem 0;
+        padding: 0 .5rem 0 1rem!important;
+        height: calc(100% - 100px);
+        max-height: calc(100% - 100px);
+        overflow: auto;
+        .group-layers{
+            padding: 0 .2rem;
+            // margin-bottom: 1rem;
+            .title {
+                font-weight: 600;
+                font-size: .85rem;
+                margin-bottom: .5rem;
+                a {
+                    text-decoration: none;
+                    color: rgb(0, 56, 112);
+                }
+            }
+        }
+        
+        .layer-list-content{
+            font-size: 1rem;
+            color: rgb(0, 56, 112);
+        }
+        .layer-list-row {
+            margin-bottom: .5rem;
+            min-height: 30px;
+        }
+        .layer-list-row:hover{
+            background-color: azure;
+        }
+    }
+}
+
+.layer-list-img {
+    height: 20px!important;
+    width: 20px!important;
+}

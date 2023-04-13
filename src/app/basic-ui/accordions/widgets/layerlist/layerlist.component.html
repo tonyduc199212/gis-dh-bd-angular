@@ -1,0 +1,139 @@
+<div class="card stretch-card layer-list" [ngClass]="{'expand': _widgetSize == 'lg'}">
+    <div class="card-header">
+        <h4>{{'Danh sách lớp bản đồ' }}</h4> 
+        <button *ngIf="_widgetSize == 'md'" class="btn-toggle-size" [tooltip]="'global_maximize' " (click)="toggleWidgetSize('lg')"><i class="mdi mdi-arrow-expand mdi-18px"></i></button>
+        <button *ngIf="_widgetSize == 'lg'" class="btn-toggle-size" [tooltip]="'global_minimize' " (click)="toggleWidgetSize('md')"><i class="mdi mdi-arrow-collapse mdi-18px"></i></button>
+        <button class="btn-close" [tooltip]="'Đóng' " (click)="close()"><i class="mdi mdi-window-close mdi-18px"></i></button>
+    </div>
+    <div class="card-body">
+        <perfect-scrollbar class="scrollView" [config]="scrollbarConfig">
+            <div class="group-layers">
+                <div class="title">
+                    <a class="cursor-pointer" (click)="collapseZoningLayer()"> 
+                        <i *ngIf="isCollapseBaseLayer" class="mdi mdi-folder text-warning pr-2"></i>
+                        <i *ngIf="!isCollapseBaseLayer" class="mdi mdi-folder-open text-warning pr-2"></i>
+                        {{'Lớp dữ liệu nền' }}
+                    </a>
+                </div>
+                <div class="detail" [hidden]="isCollapseBaseLayer">
+                    <div class="p-0">
+                        <div class="row">
+                            <div class="col-1 pt-0 pb-0">
+                                <input class="form-group " checked="checked" id="checkboxBasemapStreets" [tooltip]="'Bản đồ nền đường phố' " type="radio" value="streets" name="basemapToggle" (change)="toggleBasemap('streets')"/>
+                            </div>
+                            <div class="col-1 pt-0 pb-0 text-center">
+                                <img src="assets/icon-layer/basemap/map_streets.png" height="20" width="20" alt=""> 
+                            </div>
+                            <div class="col-9 pl-3 pt-0 pb-0">
+                                <label class="pl-2" class="layer-list-content" for="checkboxBasemapStreets">{{'Bản đồ nền đường phố' }}</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-1 pt-0 pb-0">
+                                <input class="form-group " id="checkboxBasemapSatellite" [tooltip]="'Bản đồ nền vệ tinh' " type="radio" value="satellite" name="basemapToggle"  (change)="toggleBasemap('satellite')"/>
+                            </div>
+                            <div class="col-1 pt-0 pb-0 text-center">
+                                <img src="assets/icon-layer/basemap/map_sat.png" height="20" width="20" alt=""> 
+                            </div>
+                            <div class="col-9 pl-3 pt-0 pb-0">
+                                <label class="pl-2" class="layer-list-content" for="checkboxBasemapSatellite">{{'Bản đồ nền vệ tinh' }}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-0 pt-2" style="border-top: 1px #ddd solid;">
+                        <ng-container *ngFor="let layer of baselayerData">
+                            <div class="row">
+                                <div class="col-1 pt-0 pb-0">
+                                    <input type="checkbox" class="form-group " [tooltip]="layer.name " id="{{layer.id}}" [(ngModel)]="layer.isCheck" (change)="layer.isCheck = !layer.isCheck; resetSource()">
+                                </div>
+                                <div class="col-1 pt-0 pb-0 text-center">
+                                    <img src="{{layer.imageUrl}}" height="20" width="20" alt=""> 
+                                </div>
+                                <div class="col-9 pl-3 pt-0 pb-0">
+                                    <label class="pl-2" class="layer-list-content" for="{{layer.id}}">{{layer.name }}</label>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="group-layers">
+                <div class="title">
+                    <a class="cursor-pointer" (click)="collapseDataLayer()"> 
+                        <i *ngIf="isCollapseDataLayer" class="mdi mdi-folder text-warning pr-2"></i>
+                        <i *ngIf="!isCollapseDataLayer" class="mdi mdi-folder-open text-warning pr-2"></i>
+                        {{'Lớp dữ liệu chuyên đề' }}
+                    </a>
+                </div>
+                <div class="detail" [hidden]="isCollapseDataLayer">
+                    <div class="p-0">
+                        <div class="row">
+                            <div class="col-1">
+                                <input type="checkbox" class="form-group " [tooltip]="'Tất cả các lớp' " [checked]="_isCheckAll" id="checkboxAllLayer" (change)="toggleAllLayers(listLayers, checkboxAllLayer.checked)" #checkboxAllLayer>
+                            </div>
+                            <div class="col-1 text-center">
+                                <img src="assets/icon-layer/all-layers.svg" height="20" width="20" alt=""> 
+                            </div>
+                            <div class="col-9 pl-3">
+                                <label class="pl-2" class="layer-list-content" for="checkboxAllLayer"> <b>{{'Tất cả các lớp' }}</b></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngFor="let group of _showLayerlistData">
+                        <div *ngIf="group.childrend && group.childrend.length > 0">
+                            <div *ngIf="group.isFolder">
+                                <div class="row cursor-pointer" (click)="group.isOpen = !group.isOpen;">
+                                    <div class="col-1 p-0">
+                                        <i *ngIf="group.isOpen" [tooltip]="'global_minimize' " class="mdi mdi-folder-open text-success"></i> 
+                                        <i *ngIf="!group.isOpen" [tooltip]="'global_maximize' " class="mdi mdi-folder text-success"></i> 
+                                    </div>
+                                    <div class="col-10 p-0">
+                                        <label class="layer-list-content"> <b>{{group.name}}</b></label>
+                                    </div>
+                                </div>
+                                <div *ngFor="let layer of group.childrend" class="row align-items-center ml-4" [hidden]="!group.isOpen">
+                                    <div class="col-1 p-0 mx-auto">
+                                        <input type="checkbox" class="form-group " [tooltip]="layer.name" [checked]="initCheckbox(layer)" (change)="toggleLayer(layer, checkboxLayer.checked)" #checkboxLayer id="{{layer.id}}">
+                                    </div>
+                                    <div class="col-1 p-0 text-center">
+                                        <img src="{{layer.iconUrl}}" class="layer-list-img" alt=""> 
+                                    </div>
+                                    <div class="col-9 p-0 pl-3 pt-1">
+                                        <label class="layer-list-content pl-2" for="{{layer.id}}"> {{layer.name}}</label>
+                                    </div>
+                                    <!-- <div class="col-1 p-0">
+                                        <button class="btn btn-action" [tooltip]="'layer-list-zoom_to_layer' " [disabled]="!checkboxLayer.checked" (click)="zoomToLayer(layer)">
+                                            <span class="mdi mdi-layers-search-outline" [ngClass]="{ 'text-primary' : checkboxLayer.checked }"></span>
+                                        </button> 
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div *ngIf="!group.isFolder">
+                                <div *ngFor="let layer of group.childrend" class="row align-items-center">
+                                    <div class="col-1 p-0">
+                                        <input type="checkbox" class="form-group " [tooltip]="layer.name" [checked]="initCheckbox(layer)" (change)="toggleLayer(layer, checkboxLayer.checked)" #checkboxLayer id="{{layer.id}}">
+                                    </div>
+                                    <div class="col-1 p-0 text-center">
+                                        <img src="{{layer.iconUrl}}" class="layer-list-img" alt=""> 
+                                    </div>
+                                    <div class="col-9 p-0 pl-3 pt-1">
+                                        <label class="layer-list-content pl-2" for="{{layer.id}}"> {{layer.name}}</label>
+                                    </div>
+                                    <!-- <div class="col-1 p-0">
+                                        <button class="btn btn-action" [tooltip]="'layer-list-zoom_to_layer' " [disabled]="!checkboxLayer.checked" (click)="zoomToLayer(layer.layerUrl)">
+                                            <span class="mdi mdi-layers-search-outline" [ngClass]="{ 'text-primary' : checkboxLayer.checked }"></span>
+                                        </button> 
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </perfect-scrollbar>
+    </div>
+    <div class="card-footer text-right">
+        <button type="button" class="btn btn-light" (click)="close()"><i class="mdi mdi-cancel"></i> {{'Đóng' }}</button>
+    </div>
+</div>

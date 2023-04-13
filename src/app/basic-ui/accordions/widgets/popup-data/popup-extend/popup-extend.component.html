@@ -1,0 +1,41 @@
+<div class="card popup-extend" [@slideLeft]="isHiddenPopup ? 'close' : 'open'"
+    [ngClass]="{'top-right': position === 'top-right', 'top-left': position === 'top-left', 'lg-position': _popupPosition === 'lg'}" 
+    *ngIf="!isHiddenPopup"
+>
+    <div class="card-header">
+        <p class="mb-0 pb-0 text-center"><b>{{'global-infor_detail' | translate}}</b></p> 
+        <span class="popup-subtitle text-overflow text-center">{{title | translate}}</span>
+        <button class="btn-close" [tooltip]="'global_close' | translate" (click)="close()"><i class="mdi mdi-window-close mdi-18px"></i></button>
+    </div>
+    <div class="card-body p-1">
+        <perfect-scrollbar class="scrollView" [config]="scrollbarConfig">
+            <div class="table-responsive mt-2">
+                <table class="table table-borderless table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 15%;">#</th>   
+                            <th *ngIf="isShowingTime">{{'global-time' | translate}}</th>                         
+                            <th style="width: 85%;">{{'global-infor_detail_name' | translate}}</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="showingData.length > 0">
+                        <tr *ngFor="let data of showingData | slice: (page-1) * pageSize : page * pageSize">
+                            <td style="height: 40px;">{{data.code}}</td>
+                            <td *ngIf="isShowingTime">{{formatDate(data)}}</td>   
+                            <td *ngIf="data.name" class="p-1">{{data.name}}</td>
+                            <td *ngIf="data.incidentType" class="p-1">{{data.incidentType.name}}</td>
+                        </tr>
+                    </tbody> 
+                </table>
+                <div class="mt-2" *ngIf="showingData.length == 0">
+                    <i class="not-found-content">{{'global_not-found' | translate}}</i>
+                </div>   
+            </div>
+        </perfect-scrollbar>
+    </div>
+    <div class="card-footer text-right">
+        <div *ngIf="showingData.length">
+            <pagination [pageNumber]="page" [pageSize]="pageSize" [totalData]="showingData.length" [currentPageData]="showingData" (pageChange)="changePage($event)"></pagination>
+        </div> 
+    </div>
+</div>
